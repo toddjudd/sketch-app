@@ -11,31 +11,65 @@ class Canvas extends Component {
       endPos: [0, 0],
       currentPos: [0, 0],
       drawing: false,
-      color: 'rgb(0, 0, 0)',
-      lines: []
+      color: '#626c70',
+      lineDash: [],
+      tool: 'drawLine',
+      shapes: [],
+      midPos: () => {
+        const x = (this.state.startPos[0] + this.state.currentPos[0]) / 2;
+        const y = (this.state.startPos[1] + this.state.currentPos[1]) / 2;
+        return [x, y];
+      },
+      rectWidth: () => {
+        return this.state.currentPos[0] - this.state.startPos[0];
+      },
+      rectHeight: () => {
+        return this.state.currentPos[1] - this.state.startPos[1];
+      },
+      arcRadius: () => {
+        let radW = Math.abs(this.state.rectWidth() / 2);
+        let radH = Math.abs(this.state.rectHeight() / 2);
+        return radH < radW ? radW : radH;
+      },
+      xRad: () => {
+        return Math.abs(this.state.rectWidth() / 2);
+      },
+      yRad: () => {
+        return Math.abs(this.state.rectHeight() / 2);
+      }
     };
   }
 
-  saveLine() {
+  saveShape() {
     //get state
-    let lines = this.state.lines;
+    let shapes = this.state.shapes;
     //add line
-    lines.push({ startPos: this.state.startPos, endPos: this.state.endPos, color: this.state.color });
+    shapes.push({
+      startPos: this.state.startPos,
+      currentPos: this.state.endPos,
+      endPos: this.state.endPos,
+      color: this.state.color,
+      lineDash: this.state.lineDash,
+      tool: this.state.tool,
+      midPos: this.state.midPos(),
+      rectWidth: this.state.rectWidth(),
+      rectHeight: this.state.rectHeight(),
+      arcRadius: this.state.arcRadius()
+    });
     //save state
-    this.setState({ lines });
-    this.drawLines();
+    this.setState({ shapes });
+    this.drawShapes();
   }
 
-  drawLines() {
+  drawShapes() {
+    console.log('drawShapes');
     const ctx = this.canvas.current.getContext('2d');
     if (!this.state.drawing) ctx.clearRect(0, 0, this.canvas.current.width, this.canvas.current.height);
-    this.state.lines.forEach(line => {
+    this.state.shapes.forEach(shape => {
       ctx.beginPath();
-      ctx.strokeStyle = line.color;
-      ctx.setLineDash([15, 15]);
-      ctx.moveTo(line.startPos[0], line.startPos[1]);
-      ctx.lineTo(line.endPos[0], line.endPos[1]);
-      ctx.stroke();
+      ctx.strokeStyle = shape.color;
+      ctx.setLineDash(shape.lineDash);
+      this[shape.tool](ctx, shape);
     });
   }
 
@@ -54,7 +88,7 @@ class Canvas extends Component {
             endPos: [e.pageX, e.pageY],
             drawing: false
           },
-          this.saveLine
+          this.saveShape
         );
         break;
       default:
@@ -68,19 +102,65 @@ class Canvas extends Component {
     }
     const ctx = this.canvas.current.getContext('2d');
     ctx.clearRect(0, 0, this.canvas.current.width, this.canvas.current.height);
-    ctx.beginPath();
+    ctx.setLineDash(this.state.lineDash);
     ctx.strokeStyle = this.state.color;
-    ctx.setLineDash([5, 5]);
+    this[this.state.tool](ctx, false);
 
-    ctx.moveTo(this.state.startPos[0], this.state.startPos[1]);
-    ctx.lineTo(this.state.currentPos[0], this.state.currentPos[1]);
-    ctx.stroke();
-    this.drawLines();
+    this.drawShapes();
   }
+
+  drawLine = (ctx, shape) => {
+    console.log('Draw Line');
+    console.log(shape);
+
+    if (!shape) {
+      shape = { startPos: this.state.startPos, currentPos: this.state.currentPos };
+    }
+    ctx.beginPath();
+    ctx.moveTo(shape.startPos[0], shape.startPos[1]);
+    ctx.lineTo(shape.currentPos[0], shape.currentPos[1]);
+    ctx.stroke();
+  };
+
+  drawSquare = (ctx, shape) => {
+    console.log('Draw Square');
+    console.log(shape);
+    if (!shape) {
+      shape = {
+        startPos: this.state.startPos,
+        rectHeight: this.state.rectHeight(),
+        rectWidth: this.state.rectWidth()
+      };
+    }
+    ctx.strokeRect(shape.startPos[0], shape.startPos[1], shape.rectWidth, shape.rectHeight);
+  };
+
+  drawCircle = (ctx, shape) => {
+    console.log('Draw Circle');
+    console.log(shape);
+    if (!shape) {
+      shape = { midPos: this.state.midPos(), arcRadius: this.state.arcRadius() };
+    }
+    ctx.beginPath();
+    ctx.arc(shape.midPos[0], shape.midPos[1], shape.arcRadius, 0, 2 * Math.PI);
+    ctx.stroke();
+  };
 
   pickColor = e => {
     this.setState({
       color: getComputedStyle(e.target).color
+    });
+  };
+
+  pickLine = lineDash => {
+    this.setState({
+      lineDash
+    });
+  };
+
+  pickTool = tool => {
+    this.setState({
+      tool
     });
   };
 
@@ -111,7 +191,7 @@ class Canvas extends Component {
           onMouseMove={e => this.touch(e)}
           onTouchMove={e => this.touch(e)}
         ></canvas>
-        <Controls pickColor={this.pickColor} />
+        <Controls pickColor={this.pickColor} pickTool={this.pickTool} pickLine={this.pickLine} />
       </React.Fragment>
     );
   }

@@ -26,12 +26,22 @@ body {
   bottom: 10px;
   right: 10px;
   margin: 0;
-  background: #648593;
+  padding: 8px;
+  background: #d5e9f2;
   list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 8px;
 }
 
 li {
+  font-size: 2em;
   margin: 0;
+  padding: 4px;
+  width: 100%;
+  cursor: pointer;
 }
 
 #red {
@@ -48,4 +58,65 @@ li {
 
 #yellow {
   color: #e3b505;
+}
+
+#black {
+  color: #626c70;
+}
+
+.line {
+  background-color: black;
+  width: 3px;
+  min-height: 32px;
+  -ms-transform: rotate(45deg); /* IE 9 */
+  -webkit-transform: rotate(45deg); /* Safari prior 9.0 */
+  transform: rotate(45deg); /* Standard syntax */
+  margin: auto;
+  /* border: 2px solid black; */
+  cursor: pointer;
+}
+
+#dottedLine {
+  background: linear-gradient(
+    to top,
+    black 20%,
+    rgba(0, 0, 0, 0) 20%,
+    rgba(0, 0, 0, 0) 40%,
+    black 40%,
+    black 60%,
+    rgba(0, 0, 0, 0) 60%,
+    rgba(0, 0, 0, 0) 80%,
+    black 80%
+  );
+}
+#line {
+  background-color: black;
+  width: 3px;
+  min-height: 32px;
+  -ms-transform: rotate(45deg); /* IE 9 */
+  -webkit-transform: rotate(45deg); /* Safari prior 9.0 */
+  transform: rotate(45deg); /* Standard syntax */
+  margin: auto;
+  /* border: 2px solid black; */
+  cursor: pointer;
+}
+
+#circle {
+  border-radius: 32px;
+  border: 2px solid black;
+  width: 32px;
+  height: 32px;
+  margin: auto;
+}
+
+#square {
+  border: 2px solid black;
+  width: 32px;
+  height: 32px;
+  margin: auto;
+}
+
+#breakpoint {
+  border-bottom: solid 2px #626c70;
+  margin-bottom: 4px;
 }
