@@ -74,15 +74,20 @@ class Canvas extends Component {
   }
 
   touch(e) {
+    e.preventDefault();
     if (e.button === 2) return;
     switch (e.type) {
-      case 'mousedown' || 'touchdown':
+      case 'mousedown':
+      case 'touchstart':
+        // alert('touchstart');
         this.setState({
           startPos: [e.pageX, e.pageY],
           drawing: true
         });
         break;
-      case 'mouseup' || 'touchup':
+      case 'mouseup':
+      case 'touchend':
+        // alert('touchend');
         this.setState(
           {
             endPos: [e.pageX, e.pageY],
@@ -92,6 +97,7 @@ class Canvas extends Component {
         );
         break;
       default:
+        // alert('touchdefault');
         this.setState({
           currentPos: [e.pageX, e.pageY]
         });
@@ -101,6 +107,7 @@ class Canvas extends Component {
       return;
     }
     const ctx = this.canvas.current.getContext('2d');
+    // alert(ctx);
     ctx.clearRect(0, 0, this.canvas.current.width, this.canvas.current.height);
     ctx.setLineDash(this.state.lineDash);
     ctx.strokeStyle = this.state.color;
