@@ -11,6 +11,7 @@ class Canvas extends Component {
       endPos: [0, 0],
       currentPos: [0, 0],
       drawing: false,
+      color: 'rgb(0, 0, 0)',
       lines: []
     };
   }
@@ -19,8 +20,7 @@ class Canvas extends Component {
     //get state
     let lines = this.state.lines;
     //add line
-    lines.push({ startPos: this.state.startPos, endPos: this.state.endPos });
-    console.log(lines);
+    lines.push({ startPos: this.state.startPos, endPos: this.state.endPos, color: this.state.color });
     //save state
     this.setState({ lines });
     this.drawLines();
@@ -31,6 +31,7 @@ class Canvas extends Component {
     if (!this.state.drawing) ctx.clearRect(0, 0, this.canvas.current.width, this.canvas.current.height);
     this.state.lines.forEach(line => {
       ctx.beginPath();
+      ctx.strokeStyle = line.color;
       ctx.setLineDash([15, 15]);
       ctx.moveTo(line.startPos[0], line.startPos[1]);
       ctx.lineTo(line.endPos[0], line.endPos[1]);
@@ -39,7 +40,7 @@ class Canvas extends Component {
   }
 
   touch(e) {
-    // let startPos, endPos, currentPos;
+    if (e.button === 2) return;
     switch (e.type) {
       case 'mousedown' || 'touchdown':
         this.setState({
@@ -68,6 +69,7 @@ class Canvas extends Component {
     const ctx = this.canvas.current.getContext('2d');
     ctx.clearRect(0, 0, this.canvas.current.width, this.canvas.current.height);
     ctx.beginPath();
+    ctx.strokeStyle = this.state.color;
     ctx.setLineDash([5, 5]);
 
     ctx.moveTo(this.state.startPos[0], this.state.startPos[1]);
@@ -76,8 +78,13 @@ class Canvas extends Component {
     this.drawLines();
   }
 
+  pickColor = e => {
+    this.setState({
+      color: getComputedStyle(e.target).color
+    });
+  };
+
   componentDidMount() {
-    console.log('Canvas Did Mount');
     const canvas = this.canvas.current;
 
     function resizeCanvas(canvas) {
@@ -94,8 +101,8 @@ class Canvas extends Component {
     return (
       <React.Fragment>
         <canvas
-          id="canvas"
-          className="Canvas"
+          id='canvas'
+          className='Canvas'
           ref={this.canvas}
           onTouchStart={e => this.touch(e)}
           onMouseDown={e => this.touch(e)}
@@ -104,7 +111,7 @@ class Canvas extends Component {
           onMouseMove={e => this.touch(e)}
           onTouchMove={e => this.touch(e)}
         ></canvas>
-        <Controls />
+        <Controls pickColor={this.pickColor} />
       </React.Fragment>
     );
   }
