@@ -1,0 +1,51 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+}
+
+#canvas {
+  flex: auto;
+  object-fit: cover;
+  /* border: 3px solid black; */
+}
+
+#controls {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  margin: 0;
+  background: #648593;
+  list-style: none;
+}
+
+li {
+  margin: 0;
+}
+
+#red {
+  color: #db504a;
+}
+
+#blue {
+  color: #0f96bf;
+}
+
+#green {
+  color: #4aa555;
+}
+
+#yellow {
+  color: #e3b505;
+}
